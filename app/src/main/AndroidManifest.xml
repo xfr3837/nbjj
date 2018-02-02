@@ -25,7 +25,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".tips.Tips" />
-        <activity android:name=".students.FindStudentsActivity"></activity>
     </application>
 
 </manifest>

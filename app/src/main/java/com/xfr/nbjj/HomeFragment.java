@@ -45,8 +45,6 @@ public class HomeFragment extends Fragment {
         findStudentsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), com.xfr.nbjj.students.FindStudentsActivity.class);
-                startActivity(intent);
             }
         });
 
