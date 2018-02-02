@@ -32,12 +32,11 @@ public class Searcher {
      */
 
     // TODO 明星教员、有照片这两个搜索条件还未涵盖
-    public static List<Teacher> getOnePageTeachersInfo(OkHttpClient client, String searchPage,
-                                                       String searchNum, String searchMajor,
-                                                       String searchSubject,
+    public static List<Teacher> getOnePageTeachersInfo(OkHttpClient client, int teacherType,
+                                                       String searchPage, String searchNum,
+                                                       String searchMajor, String searchSubject,
                                                        String searchLocation,
-                                                       String searchUniversity,
-                                                       String searchSex,
+                                                       String searchUniversity, String searchSex,
                                                        String searchEducation) {
         // 将参数转换成 url encoding
         try {
@@ -63,8 +62,8 @@ public class Searcher {
                 "&xl=" + searchEducation;
 
         // 搜索所得网页中老师的各个属性，用于 Teacher 的构造函数
-        //编号、姓名、年龄、学历、科目、自我介绍、照片、时间
-        String number, name, sex, education, subjects, personalIntroduction, photo, time;
+        //编号、姓名、性别、身份(学历)、科目、自我介绍、照片、时间
+        String number, name, sex, star, identity, subjects, personalIntroduction, photo, time;
 
         List<Teacher> teachers = new ArrayList<>();
 
@@ -93,10 +92,16 @@ public class Searcher {
 
                 // 性别
                 StringBuilder sexStringBuilder = new StringBuilder(teacherNameSex);
-                sex = sexStringBuilder.replace(0, teacherNameSex.length()-1, "").toString();
+                sex = sexStringBuilder.replace(0, i+1, "")
+                        .replace(1, sexStringBuilder.length(), "").toString();
 
-                // 学历
-                education = element.getElementsByAttributeValue("width", "14%").text();
+
+                // 如果是明星教员，star.equals("明星教员") 为真
+                // 否则 star.equals("") 为真
+                star = element.getElementsByAttributeValue("id", "star").next().text();
+
+                // 身份(学历)
+                identity = element.getElementsByAttributeValue("width", "14%").text();
 
                 // 课程
                 subjects = element.getElementsByAttributeValue("width", "24%").get(0).text();
@@ -112,13 +117,14 @@ public class Searcher {
 
                 personalIntroduction = personalIntroductionStringBuilder.toString();
 
-                // 照片
+                // 如果存在照片， 则 photo 是地址
+                // 如果不存在照片， photo.equals("") 为真
                 photo = element.getElementsByAttributeValue("width", "24%").select("a").attr("href");
 
                 // 时间
                 time = element.getElementsByAttributeValue("width", "9%").get(1).text();
 
-                teachers.add(new Teacher(number, name, sex, education, subjects, personalIntroduction, photo, time));
+                teachers.add(new Teacher(number, name, sex, star, identity, subjects, personalIntroduction, photo, time));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -181,10 +187,8 @@ public class Searcher {
                 // 编号
                 number = element.getElementsByClass("red_b_14").text();
 
-                //置顶
+                // 如果置顶， top.equals("推荐信息") 为真
                 top = element.getElementsByClass("ZhiDing").text();
-                if (top != "推荐信息")
-                    top = "不置顶";
 
                 // 年级、性别、科目
                 // TODO 用 indexOf() 更方便，写的时候不知道
