@@ -51,7 +51,7 @@ public class Main2Activity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    // 据说这样能自动处理 cookies ，未验证
+                    // 据说这样能自动处理 cookies ，还未验证
                     ClearableCookieJar cookieJar =
                             new PersistentCookieJar(new SetCookieCache(),
                                     new SharedPrefsCookiePersistor(Main2Activity.this));
