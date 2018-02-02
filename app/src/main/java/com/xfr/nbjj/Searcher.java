@@ -1,6 +1,5 @@
 package com.xfr.nbjj;
 
-import android.widget.Toast;
 
 import com.xfr.nbjj.students.Student;
 import com.xfr.nbjj.teachers.Teacher;
@@ -10,6 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +32,6 @@ public class Searcher {
      */
 
     // TODO 明星教员、有照片这两个搜索条件还未涵盖
-    // TODO 搜索条件应为 url encoding
     public static List<Teacher> getOnePageTeachersInfo(OkHttpClient client, String searchPage,
                                                        String searchNum, String searchMajor,
                                                        String searchSubject,
@@ -40,7 +39,19 @@ public class Searcher {
                                                        String searchUniversity,
                                                        String searchSex,
                                                        String searchEducation) {
+        // 将参数转换成 url encoding
+        try {
+            searchMajor = URLEncoder.encode(searchMajor, "gbk");
+            searchSubject = URLEncoder.encode(searchSubject, "gbk");
+            searchLocation = URLEncoder.encode(searchLocation, "gbk");
+            searchUniversity = URLEncoder.encode(searchUniversity, "gbk");
+            searchSex = URLEncoder.encode(searchSex, "gbk");
+            searchEducation = URLEncoder.encode(searchEducation, "gbk");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
+        // 构造 url
         String url = "http://www.ningbojiajiao.com/Teacher.asp?" +
                 "page=" + searchPage +
                 "&num=" + searchNum +
@@ -51,6 +62,8 @@ public class Searcher {
                 "&sex=" + searchSex +
                 "&xl=" + searchEducation;
 
+        // 搜索所得网页中老师的各个属性，用于 Teacher 的构造函数
+        //编号、姓名、年龄、学历、科目、自我介绍、照片、时间
         String number, name, sex, education, subjects, personalIntroduction, photo, time;
 
         List<Teacher> teachers = new ArrayList<>();
@@ -113,6 +126,7 @@ public class Searcher {
         return teachers;
     }
 
+
     /**
      * 向这个方法传入搜索所需条件，返回网站中一页 student
      * 一般来说一页有十个，但是条件过于苛刻或者在最后一页的时候可能会少于十个
@@ -120,7 +134,6 @@ public class Searcher {
      * @return List<Student>
      */
 
-    // TODO 搜索条件应为 url encoding
     public static List<Student> getOnePageStudentsInfo(OkHttpClient client, String searchPage,
                                                        String searchNum, String searchSubject,
                                                        String searchLocation,
@@ -128,15 +141,31 @@ public class Searcher {
                                                        String searchTeacherSex,
                                                        String searchStatus) {
 
-        // 根据参数构造出 url
-        String url = "http://www.ningbojiajiao.com/Student.asp?page=" + searchPage + "&num=" +
-                searchNum + "&km=" + searchSubject + "&dq=" + searchLocation + "&sex=" +
-                searchStudentSex + "&sex2=" + searchTeacherSex + "&zt=" + searchStatus;
+        // 将参数转换成 url encoding
+        try {
+            searchSubject = URLEncoder.encode(searchSubject, "gbk");
+            searchLocation = URLEncoder.encode(searchLocation, "gbk");
+            searchStudentSex = URLEncoder.encode(searchStudentSex, "gbk");
+            searchTeacherSex = URLEncoder.encode(searchTeacherSex, "gbk");
+            searchStatus = URLEncoder.encode(searchStatus, "gbk");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        // 搜索页面每个学生的信息
+        // 构造 url
+        String url = "http://www.ningbojiajiao.com/Student.asp?" +
+                "page=" + searchPage +
+                "&num=" + searchNum +
+                "&km=" + searchSubject +
+                "&dq=" + searchLocation +
+                "&sex=" + searchStudentSex +
+                "&sex2=" + searchTeacherSex +
+                "&zt=" + searchStatus;
+
+
+        // 搜索页面每个学生的信息，用于 Student 的构造函数
         // 编号、置顶、年级、性别、学科、性别要求、具体要求、位置、状态、时间、
-        String number, top, grade, sex, subject, sexRequire, specificRequire, location,
-                status = null, time = null;
+        String number, top, grade, sex, subject, sexRequire, specificRequire, location, status, time;
 
         List<Student> students = new ArrayList<Student>();
 
@@ -221,6 +250,7 @@ public class Searcher {
     }
 
 
+    //获取 Document 类型的网页，用来解析
     private static Document getDocument (OkHttpClient client, String url) {
 
         try {
