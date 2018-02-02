@@ -12,9 +12,7 @@ import com.franmontiel.persistentcookiejar.ClearableCookieJar;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
-import com.xfr.nbjj.students.Searcher;
 import com.xfr.nbjj.students.Student;
-import com.xfr.nbjj.students.StudentAdapter;
 
 
 import java.util.ArrayList;
@@ -53,6 +51,7 @@ public class Main2Activity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
+                    // 据说这样能自动处理 cookies ，未验证
                     ClearableCookieJar cookieJar =
                             new PersistentCookieJar(new SetCookieCache(),
                                     new SharedPrefsCookiePersistor(Main2Activity.this));
@@ -60,10 +59,7 @@ public class Main2Activity extends AppCompatActivity {
                             .cookieJar(cookieJar)
                             .build();
 
-                    Searcher searcher = new Searcher(client, "", "",
-                            "", "", "",
-                            "", "");
-                    studentList = searcher.getOnePageStudentsInfo();
+
 
             } catch (Exception e) {
                     Toast.makeText(Main2Activity.this, "error", Toast.LENGTH_SHORT).show();

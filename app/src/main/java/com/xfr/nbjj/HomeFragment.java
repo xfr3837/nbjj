@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.xfr.nbjj.students.SearchStudentsActivity;
 import com.xfr.nbjj.tips.Tips;
 
 /**
@@ -40,15 +39,14 @@ public class HomeFragment extends Fragment {
         findTeachersButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), SearchStudentsActivity.class);
-                startActivity(intent);
             }
         });
 
         findStudentsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(getActivity(), com.xfr.nbjj.students.FindStudentsActivity.class);
+                startActivity(intent);
             }
         });
 
