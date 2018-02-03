@@ -1,6 +1,12 @@
 package com.xfr.nbjj;
 
 
+import android.content.Context;
+
+import com.franmontiel.persistentcookiejar.ClearableCookieJar;
+import com.franmontiel.persistentcookiejar.PersistentCookieJar;
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.xfr.nbjj.students.Student;
 import com.xfr.nbjj.teachers.Teacher;
 
@@ -32,34 +38,15 @@ public class Searcher {
      */
 
     // TODO 明星教员、有照片这两个搜索条件还未涵盖
-    public static List<Teacher> getOnePageTeachersInfo(OkHttpClient client, int teacherType,
-                                                       String searchPage, String searchNum,
-                                                       String searchMajor, String searchSubject,
-                                                       String searchLocation,
-                                                       String searchUniversity, String searchSex,
-                                                       String searchEducation) {
-        // 将参数转换成 url encoding
-        try {
-            searchMajor = URLEncoder.encode(searchMajor, "gbk");
-            searchSubject = URLEncoder.encode(searchSubject, "gbk");
-            searchLocation = URLEncoder.encode(searchLocation, "gbk");
-            searchUniversity = URLEncoder.encode(searchUniversity, "gbk");
-            searchSex = URLEncoder.encode(searchSex, "gbk");
-            searchEducation = URLEncoder.encode(searchEducation, "gbk");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static List<Teacher> getOnePageTeachersInfo(Context context, String url) {
 
-        // 构造 url
-        String url = "http://www.ningbojiajiao.com/Teacher.asp?" +
-                "page=" + searchPage +
-                "&num=" + searchNum +
-                "&zy=" + searchMajor +
-                "&km=" + searchSubject +
-                "&skdq=" + searchLocation +
-                "&xx=" + searchUniversity +
-                "&sex=" + searchSex +
-                "&xl=" + searchEducation;
+        // 据说这样可以自动化处理 cookies
+        ClearableCookieJar cookieJar =
+                new PersistentCookieJar(new SetCookieCache(),
+                        new SharedPrefsCookiePersistor(context));
+        OkHttpClient client = new OkHttpClient.Builder()
+                .cookieJar(cookieJar)
+                .build();
 
         // 搜索所得网页中老师的各个属性，用于 Teacher 的构造函数
         //编号、姓名、性别、身份(学历)、科目、自我介绍、照片、时间
@@ -140,34 +127,15 @@ public class Searcher {
      * @return List<Student>
      */
 
-    public static List<Student> getOnePageStudentsInfo(OkHttpClient client, String searchPage,
-                                                       String searchNum, String searchSubject,
-                                                       String searchLocation,
-                                                       String searchStudentSex,
-                                                       String searchTeacherSex,
-                                                       String searchStatus) {
+    public static List<Student> getOnePageStudentsInfo(Context context, String url) {
 
-        // 将参数转换成 url encoding
-        try {
-            searchSubject = URLEncoder.encode(searchSubject, "gbk");
-            searchLocation = URLEncoder.encode(searchLocation, "gbk");
-            searchStudentSex = URLEncoder.encode(searchStudentSex, "gbk");
-            searchTeacherSex = URLEncoder.encode(searchTeacherSex, "gbk");
-            searchStatus = URLEncoder.encode(searchStatus, "gbk");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // 构造 url
-        String url = "http://www.ningbojiajiao.com/Student.asp?" +
-                "page=" + searchPage +
-                "&num=" + searchNum +
-                "&km=" + searchSubject +
-                "&dq=" + searchLocation +
-                "&sex=" + searchStudentSex +
-                "&sex2=" + searchTeacherSex +
-                "&zt=" + searchStatus;
-
+        // 据说这样可以自动化处理 cookies
+        ClearableCookieJar cookieJar =
+                new PersistentCookieJar(new SetCookieCache(),
+                        new SharedPrefsCookiePersistor(context));
+        OkHttpClient client = new OkHttpClient.Builder()
+                .cookieJar(cookieJar)
+                .build();
 
         // 搜索页面每个学生的信息，用于 Student 的构造函数
         // 编号、置顶、年级、性别、学科、性别要求、具体要求、位置、状态、时间、
@@ -253,6 +221,64 @@ public class Searcher {
         return students;
     }
 
+
+    // 获取老师 url
+    public static String getTeachersURl(String searchPage, String searchNum,
+                                        String searchMajor, String searchSubject,
+                                        String searchLocation, String searchUniversity,
+                                        String searchSex, String searchEducation) {
+        // 将参数转换成 url encoding
+        try {
+            searchMajor = URLEncoder.encode(searchMajor, "gbk");
+            searchSubject = URLEncoder.encode(searchSubject, "gbk");
+            searchLocation = URLEncoder.encode(searchLocation, "gbk");
+            searchUniversity = URLEncoder.encode(searchUniversity, "gbk");
+            searchSex = URLEncoder.encode(searchSex, "gbk");
+            searchEducation = URLEncoder.encode(searchEducation, "gbk");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 构造 url
+        String url = "http://www.ningbojiajiao.com/Teacher.asp?" +
+                "page=" + searchPage +
+                "&num=" + searchNum +
+                "&zy=" + searchMajor +
+                "&km=" + searchSubject +
+                "&skdq=" + searchLocation +
+                "&xx=" + searchUniversity +
+                "&sex=" + searchSex +
+                "&xl=" + searchEducation;
+        return url;
+    }
+
+
+    // 获取学生 url
+    public static String getStudentsURL(String searchPage, String searchNum, String searchSubject,
+                                       String searchLocation, String searchStudentSex,
+                                       String searchTeacherSex, String searchStatus) {
+        // 将参数转换成 url encoding
+        try {
+            searchSubject = URLEncoder.encode(searchSubject, "gbk");
+            searchLocation = URLEncoder.encode(searchLocation, "gbk");
+            searchStudentSex = URLEncoder.encode(searchStudentSex, "gbk");
+            searchTeacherSex = URLEncoder.encode(searchTeacherSex, "gbk");
+            searchStatus = URLEncoder.encode(searchStatus, "gbk");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 构造 url
+        String url = "http://www.ningbojiajiao.com/Student.asp?" +
+                "page=" + searchPage +
+                "&num=" + searchNum +
+                "&km=" + searchSubject +
+                "&dq=" + searchLocation +
+                "&sex=" + searchStudentSex +
+                "&sex2=" + searchTeacherSex +
+                "&zt=" + searchStatus;
+        return url;
+    }
 
     //获取 Document 类型的网页，用来解析
     private static Document getDocument (OkHttpClient client, String url) {
