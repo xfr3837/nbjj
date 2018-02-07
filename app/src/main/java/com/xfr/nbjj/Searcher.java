@@ -8,6 +8,7 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.xfr.nbjj.students.Student;
+import com.xfr.nbjj.students.StudentDetail;
 import com.xfr.nbjj.teachers.Teacher;
 
 import org.jsoup.Jsoup;
@@ -29,6 +30,47 @@ import okhttp3.Response;
  */
 
 public class Searcher {
+
+    public static StudentDetail getStudentDetailInfo(Context context, String pageNumber) {
+        String url, status, time, number, location, sex, grade, subject, salary, teachTime, studentDescribe, teacherRequire;
+
+        url = "http://www.ningbojiajiao.com/student/" + pageNumber + ".html";
+
+        // 据说这样可以自动化处理 cookies
+        ClearableCookieJar cookieJar =
+                new PersistentCookieJar(new SetCookieCache(),
+                        new SharedPrefsCookiePersistor(context));
+        OkHttpClient client = new OkHttpClient.Builder()
+                .cookieJar(cookieJar)
+                .build();
+        Document document = getDocument(client, url);
+
+        try {
+            Elements elements = document.getElementsByAttributeValue("align", "left");
+            status = elements.get(0).text();
+            status = new StringBuilder(status)
+                    .replace(status.length() - 16, status.length(), "").toString();
+            time = elements.get(1).text();
+            number = elements.get(2).text();
+            location = elements.get(3).text();
+            location = new StringBuilder(location)
+                    .replace(location.length() - 9, location.length(), "").toString();
+            sex = elements.get(4).text();
+            grade = elements.get(5).text();
+            subject = elements.get(6).text();
+            salary = elements.get(7).text();
+            salary = new StringBuilder(salary)
+                    .replace(salary.length() - 12, salary.length(), "").toString();
+            teachTime = elements.get(8).text();
+            studentDescribe = elements.get(9).text();
+            teacherRequire = document.getElementsByAttributeValue("colspan", "2").get(2).text();
+            return new StudentDetail(status, time, number, location, sex, grade, subject, salary, teachTime, studentDescribe, teacherRequire);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new StudentDetail();
+
+    }
 
     /**
      * 向这个方法传入搜索所需条件，返回网页中一页 teacher
