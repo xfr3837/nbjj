@@ -5,6 +5,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+/**
+ * 学生详情页面
+ * Create by xfr on 2018/2/7
+ */
+
 public class StudentDetailActivity extends AppCompatActivity {
 
     private String studentNumber;

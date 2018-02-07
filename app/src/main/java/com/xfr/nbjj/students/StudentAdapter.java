@@ -15,6 +15,7 @@ import com.xfr.nbjj.StudentDetailActivity;
 import java.util.List;
 
 /**
+ * 大致和 《第一行代码》中相同
  * Created by xfr on 2018/1/30.
  */
 
@@ -68,6 +69,7 @@ public class StudentAdapter  extends RecyclerView.Adapter<StudentAdapter.ViewHol
             public void onClick(View view) {
                 int position = holder.getAdapterPosition();
                 Student student = mStudentList.get(position);
+                // 传递家教编号给学生详情页面 StudentDetailActivity
                 Intent intent = new Intent(mContext, StudentDetailActivity.class);
                 intent.putExtra("student_number", student.getNumber());
                 mContext.startActivity(intent);
@@ -76,6 +78,7 @@ public class StudentAdapter  extends RecyclerView.Adapter<StudentAdapter.ViewHol
         return holder;
     }
 
+    // 构造方法的 context 参数：为了点击事件中构造 intent(mContext, ...)
     public StudentAdapter(List<Student> studentListList, Context context) {
         mStudentList = studentListList;
         mContext = context;
