@@ -26,6 +26,7 @@
         </activity>
         <activity android:name=".SearchStudentsActivity" />
         <activity android:name=".tips.Tips" />
+        <activity android:name=".StudentDetailActivity"></activity>
     </application>
 
 </manifest>

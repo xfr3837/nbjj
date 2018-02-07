@@ -98,11 +98,11 @@ public class SearchStudentsActivity extends AppCompatActivity {
 
             } else {
                 List<Student> more = studentList;
-                students.addAll(studentList);
+                students.addAll(more);
             }
 
             if (mAdapter == null) {
-                recyclerView.setAdapter(mAdapter = new StudentAdapter(students));
+                recyclerView.setAdapter(mAdapter = new StudentAdapter(students, SearchStudentsActivity.this));
             } else {
                 mAdapter.notifyDataSetChanged();
             }

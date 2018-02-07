@@ -42,7 +42,12 @@ public class Student {
                 "time:" + time + "\n";
     }
 
-
+    public String getInfo() {
+        return "学员：" + grade + sex + "\n" +
+                "科目：" + subject + "\n" +
+                "地址：" + location + "\n" +
+                "要求：" + specificRequire;
+    }
 
     public void setNumber(String number) {
         this.number = number;
