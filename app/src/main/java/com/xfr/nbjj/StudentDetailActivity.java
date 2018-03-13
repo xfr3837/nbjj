@@ -47,7 +47,7 @@ public class StudentDetailActivity extends AppCompatActivity {
         // 加载数据，此方法必须重写
         @Override
         protected StudentDetail doInBackground(String... strings) {
-            return Searcher.getStudentDetailInfo(StudentDetailActivity.this, strings[0]);
+            return MyOkHttp.getStudentDetailInfo(StudentDetailActivity.this, strings[0]);
         }
 
         // 加载数据结束之后调用，可以在这里隐藏进度条

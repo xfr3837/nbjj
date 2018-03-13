@@ -43,7 +43,7 @@ public class SearchStudentsActivity extends AppCompatActivity {
         setListener();
 
         // 打开页面时加载第一页数据
-        new GetData().execute(Searcher.getStudentsURL("", "",
+        new GetData().execute(MyOkHttp.getStudentsURL("", "",
                 "", "", "", "",
                 ""));
     }
@@ -82,7 +82,7 @@ public class SearchStudentsActivity extends AppCompatActivity {
                 // 当最后一个可见 Item，也就是屏幕中最后一个 Item 距离内存中最后一个 Item 不足五个的时候
                 // 自动加载下一页
                 if (lastVisibleItem + 5 >= mLayoutManager.getItemCount()) {
-                    new GetData().execute(Searcher.getStudentsURL((++ page) + "",
+                    new GetData().execute(MyOkHttp.getStudentsURL((++ page) + "",
                             "", "", "", "",
                             "", ""));
                 }
@@ -102,7 +102,7 @@ public class SearchStudentsActivity extends AppCompatActivity {
         // 加载数据，此方法必须重写
         @Override
         protected List<Student> doInBackground(String... strings) {
-            return Searcher.getOnePageStudentsInfo(SearchStudentsActivity.this, strings[0]);
+            return MyOkHttp.getOnePageStudentsInfo(SearchStudentsActivity.this, strings[0]);
         }
 
         // 加载数据结束之后调用，可以在这里隐藏进度条

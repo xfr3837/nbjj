@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.franmontiel.persistentcookiejar.ClearableCookieJar;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
+import com.franmontiel.persistentcookiejar.cache.CookieCache;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.xfr.nbjj.students.Student;
@@ -20,8 +21,11 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.FormBody;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -29,7 +33,82 @@ import okhttp3.Response;
  * @author 徐斐然
  */
 
-public class Searcher {
+public class MyOkHttp {
+
+    public static int login(String name, String passWord) {
+        // 0: 成功
+        // 1: 账号或密码错误
+        // 2: 网络超时
+        // 3: 其他错误
+        String cookies, cookie_ASPSESSIONIDSXXXXXXX, cookie_pwd, cookie_CityID, cookie_HZJJ8User, cookie_lx, cookie_id,
+                cookie_ASPNET_SessionId, cookie_JIAJIAOBA;
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .followRedirects(false)
+                .followSslRedirects(false)
+                .build();
+        // request1: 第一个 GET, 获取 ASPSESSIONIDSXXXXXXX
+        Request request1 = new Request.Builder()
+                .url("http://www.ningbojiajiao.com/m/")
+                .build();
+        try {
+            name = URLEncoder.encode(name, "gbk");
+            passWord = URLEncoder.encode(passWord, "gbk");
+            // response1:第一次 GET 获取 ASPSESSIONIDSXXXXXXX 时的 response
+            Response response1 = client.newCall(request1).execute();
+            cookie_ASPSESSIONIDSXXXXXXX = response1.header("Set-Cookie").split(" ")[0];
+
+            RequestBody body = new FormBody.Builder()
+                    .addEncoded("name", name)
+                    .addEncoded("password", passWord)
+                    .build();
+
+            // request2: POST
+            Request request2 = new Request.Builder()
+                    .url("http://www.ningbojiajiao.com/m/m_Login.asp?action=save")
+                    .header("Cookie", cookie_ASPSESSIONIDSXXXXXXX)
+                    .post(body)
+                    .build();
+            // response2: POST 返回的 response
+            Response response2 = client.newCall(request2).execute();
+            cookie_pwd = response2.headers("Set-Cookie").get(0).split(" ")[0];
+            cookie_CityID = response2.headers("Set-Cookie").get(1).split(" ")[0];
+            cookie_HZJJ8User = response2.headers("Set-Cookie").get(2).split(" ")[0];
+            cookie_lx = response2.headers("Set-Cookie").get(3).split(" ")[0];
+            cookie_id = response2.headers("Set-Cookie").get(4).split(" ")[0];
+
+            // request3: POST 之后第一个重定向
+            Request request3 = new Request.Builder()
+                    .url("http://www.ningbojiajiao.com" + response2.header("Location"))
+                    .header("Cookie", cookie_ASPSESSIONIDSXXXXXXX)
+                    .build();
+            // response3: POST 之后第一个重定向的 response
+            Response response3 = client.newCall(request3).execute();
+
+            cookie_ASPNET_SessionId = response3.headers("Set-Cookie").get(0).split(" ")[0];
+            cookie_JIAJIAOBA = response3.headers("Set-Cookie").get(1).split(" ")[0];
+
+            cookies = cookie_ASPSESSIONIDSXXXXXXX + " " + cookie_pwd + " " + cookie_CityID + " " + cookie_HZJJ8User
+                    + " " + cookie_lx + " " + cookie_id + " " + cookie_ASPNET_SessionId + " " + cookie_JIAJIAOBA;
+            Request request4 = new Request.Builder()
+                    .url("http://www.ningbojiajiao.com/m/Login_Succeed.asp")
+                    .header("Cookie", cookies)
+                    .build();
+            Response response4 = client.newCall(request4).execute();
+            // 以二进制流的形式读入数据， 以便使用 GBK 解码
+            byte[] responseBytes = response4.body().bytes();
+            // 使用 GBK 解码，否则乱码
+            String responseData = new String(responseBytes, "gb2312");
+            Document document = Jsoup.parse(responseData);
+
+            if (document.getElementsByAttributeValue("id", "ContentTitle").text().isEmpty())
+                return 3;
+            else
+                return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 3;
+        }
+    }
 
     public static StudentDetail getStudentDetailInfo(Context context, String pageNumber) {
         String url, status, time, number, location, sex, grade, subject, salary, teachTime, studentDescribe, teacherRequire;
@@ -179,6 +258,8 @@ public class Searcher {
                 .cookieJar(cookieJar)
                 .build();
 
+
+
         // 搜索页面每个学生的信息，用于 Student 的构造函数
         // 编号、置顶、年级、性别、学科、性别要求、具体要求、位置、状态、时间、
         String number, top, grade, sex, subject, sexRequire, specificRequire, location, status, time;
@@ -186,6 +267,8 @@ public class Searcher {
         List<Student> students = new ArrayList<Student>();
 
         Document document = getDocument(client, url);
+        //HttpUrl httpUrl = HttpUrl.parse("http://ningbojiajiao.com");
+        //cookieJar.saveFromResponse(httpUrl, client);
 
         try {
 
@@ -335,7 +418,7 @@ public class Searcher {
             // 以二进制流的形式读入数据， 以便使用 GBK 解码
             byte[] responseBytes = response.body().bytes();
             // 使用 GBK 解码，否则乱码
-            String responseData = new String(responseBytes, "GBK");
+            String responseData = new String(responseBytes, "gb2312");
             Document document = Jsoup.parse(responseData);
             return document;
         } catch (Exception e) {
